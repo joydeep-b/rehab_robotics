@@ -1,0 +1,9 @@
+build/
+bin/
+lib/
+msg_gen/
+src/f1tenth_course/
+src/ut_automata/
+*.kdev*
+config/car.lua
+.vscode
