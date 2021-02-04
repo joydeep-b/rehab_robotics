@@ -38,6 +38,7 @@
 #include <QPushButton>
 #include <QBoxLayout>
 #include <QLabel>
+#include <QMediaPlayer>
 #include <QPainter>
 #include <QString>
 #include <QTime>
@@ -45,9 +46,18 @@
 #include <QWidget>
 #include <QGroupBox>
 #include <QTabWidget>
+#include <QVideoWidget>
+#include <QKeyEvent>
 
 using std::string;
 using std::vector;
+
+QMediaPlayer* player1;
+QMediaPlayer* player2;
+QMediaPlayer* player3;
+QVideoWidget* videoWidget1;
+QVideoWidget* videoWidget2;
+QVideoWidget* videoWidget3;
 
 namespace ut_automata_gui {
 
@@ -55,82 +65,67 @@ namespace ut_automata_gui {
 MainWindow::MainWindow(QWidget* parent) :
     main_layout_(nullptr) {
 
-  // QPushButton* close_button = new QPushButton("Close");
-  // close_button->setFocusPolicy(Qt::NoFocus);
-  // close_button->setFixedHeight(60);
-  // QHBoxLayout* top_bar = new QHBoxLayout();
-  // font.setPointSize(20);
-  // ipaddr_label_ = new QLabel();
-  // ipaddr_label_->setWordWrap(true);
-  // status_label_ = new QLabel("Mode: Autonomous\nBattery: 0V");
-  // status_label_->setFont(font);
-  // status_label_->setAlignment(Qt::AlignHCenter);
-  // top_bar->addWidget(ipaddr_label_);
-  // top_bar->addStretch();
-  // top_bar->addWidget(status_label_);
-  // top_bar->addStretch();
-  // top_bar->addWidget(close_button);
-
-  // tab_widget_ = new QTabWidget();
-  // font.setPointSize(20);
-  // tab_widget_->setFont(font);
-  // {
-  //   QWidget* ros_group = new QWidget();
-  //   QSizePolicy expanding_policy;
-  //   expanding_policy.setVerticalPolicy(QSizePolicy::Expanding);
-  //   expanding_policy.setHorizontalPolicy(QSizePolicy::Expanding);
-  //   QPushButton* start_ros = new QPushButton("Start roscore");
-  //   QPushButton* stop_ros = new QPushButton("Stop roscore");
-  //   QPushButton* start_car = new QPushButton("Start Car");
-  //   QPushButton* stop_all = new QPushButton("Stop all nodes");
-  //   start_ros->setFont(font);
-  //   stop_ros->setFont(font);
-  //   start_car->setFont(font);
-  //   stop_all->setFont(font);
-  //   start_ros->setSizePolicy(expanding_policy);
-  //   stop_ros->setSizePolicy(expanding_policy);
-  //   start_car->setSizePolicy(expanding_policy);
-  //   stop_all->setSizePolicy(expanding_policy);
-  //   connect(start_car, SIGNAL(clicked()), this, SLOT(StartCar()));
-  //   connect(start_ros, SIGNAL(clicked()), this, SLOT(StartRos()));
-  //   connect(stop_ros, SIGNAL(clicked()), this, SLOT(StopRos()));
-  //   connect(stop_all, SIGNAL(clicked()), this, SLOT(StopAll()));
-  //   QVBoxLayout* vbox = new QVBoxLayout();
-  //   vbox->addWidget(start_ros);
-  //   vbox->addWidget(stop_ros);
-  //   vbox->addWidget(start_car);
-  //   vbox->addWidget(stop_all);
-  //   ros_group->setLayout(vbox);
-    
-  //   // Grid layout
-  //   QWidget* main_widget = new QWidget();
-  //   ros_led_ = new StatusLed("ROS");
-  //   drive_led_ = new StatusLed("Drive");
-  //   lidar_led_ = new StatusLed("LIDAR");
-  //   camera_led_ = new StatusLed("Camera");
-  //   throttle_status_ = new RealStatus(false);
-  //   steering_status_ = new RealStatus(true);
-
-  //   QGridLayout* main_layout = new QGridLayout();
-  //   main_layout->addWidget(robot_label_, 0, 0, 4, 4);
-  //   main_layout->addWidget(ros_led_, 0, 5, 1, 1);
-  //   main_layout->addWidget(drive_led_, 0, 6, 1, 1);
-  //   main_layout->addWidget(lidar_led_, 1, 5, 1, 1);
-  //   main_layout->addWidget(camera_led_, 1, 6, 1, 1);
-  //   main_layout->addWidget(throttle_status_, 0, 7, 3, 1);
-  //   main_layout->addWidget(steering_status_, 3, 5, 1, 3);
-  //   main_widget->setLayout(main_layout);
-
-  //   tab_widget_->addTab(main_widget, "Main");
-  //   tab_widget_->addTab(ros_group, tr("Startup / Shutdown"));
-  // }
-
+  player1 = new QMediaPlayer;
+  player2 = new QMediaPlayer;
+  player3 = new QMediaPlayer;
+  videoWidget1 = new QVideoWidget;
+  videoWidget2 = new QVideoWidget;
+  videoWidget3 = new QVideoWidget;
+  // videoWidget3->setAutoOrientation(true);
+  player1->setVideoOutput(videoWidget1);
+  player2->setVideoOutput(videoWidget2);
+  player3->setVideoOutput(videoWidget3);
+  player1->setMedia(QUrl::fromLocalFile("/home/joydeepb/projects/rehab_robotics/media/1.mp4"));
+  player2->setMedia(QUrl::fromLocalFile("/home/joydeepb/projects/rehab_robotics/media/2.mp4"));
+  player3->setMedia(QUrl::fromLocalFile("/home/joydeepb/projects/rehab_robotics/media/3.mp4"));
   main_layout_ = new QHBoxLayout(this);
+  main_layout_->addWidget(videoWidget1);
+  main_layout_->addWidget(videoWidget2);
+  main_layout_->addWidget(videoWidget3);
   setLayout(main_layout_);
+  player1->setMuted(true);
+  player2->setMuted(true);
+  player3->setMuted(true);
+  player1->play();
+  player2->play();
+  player3->play();
+  player1->pause();
+  player2->pause();
+  player3->pause();
   // main_layout_->addWidget(tab_widget_);
-
+  // connect(this, SIGNAL(keyPressEvent()), this, SLOT(toggle()));
+  /*
+  Three-button to four-button choices, triggered by one key per video.
+  Have a preview keyframe
+  After the video finishes, go back to preview keyframes
+  Check and rotate video orientation from metadata
+  Check compilation on Windows.
+  */
 }
 
+void MainWindow::toggle() {
+  player1->pause();
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event) {
+  if (event->key() == Qt::Key_1) {
+    player1->play();
+    player2->pause();
+    player3->pause();
+  } else if (event->key() == Qt::Key_2) {
+    player1->pause();
+    player3->pause();
+    player2->play();
+  } else if (event->key() == Qt::Key_3) {
+    player1->pause();
+    player2->pause();
+    player3->play();
+  } else {
+    player1->pause();
+    player2->pause();
+    player3->pause();
+  }
+}
 
 void MainWindow::closeWindow() {
   close();

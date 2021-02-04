@@ -47,9 +47,13 @@ public:
 
 public slots:
   void closeWindow();
+  void toggle();
 
 signals:
 
+
+protected:
+  void keyPressEvent(QKeyEvent *event);
 
 private:
 

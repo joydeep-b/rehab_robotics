@@ -26,7 +26,7 @@ ELSEIF(${CMAKE_BUILD_TYPE} MATCHES "Debug")
   SET(BUILD_SPECIFIC_LIBRARIES "")
 ENDIF()
 
-FIND_PACKAGE(Qt5 COMPONENTS Core Widgets Gui WebSockets OpenGL REQUIRED)
+FIND_PACKAGE(Qt5 COMPONENTS Core Widgets Gui OpenGL Multimedia MultimediaWidgets REQUIRED)
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
@@ -54,4 +54,6 @@ TARGET_LINK_LIBRARIES(gui
       Qt5::Gui
       Qt5::Widgets
       Qt5::OpenGL
+      Qt5::Multimedia
+      Qt5::MultimediaWidgets
       ${libs} ${OPENGL_LIBRARY} GL)
