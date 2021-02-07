@@ -28,15 +28,38 @@
 #include <QPushButton>
 #include <QMetaType>
 
+#include <QtMultimedia/QMediaPlayer>
+#include <QtMultimedia/QMediaPlaylist>
+#include <QtMultimediaWidgets/QVideoWidget>
+
 #include "gui_mainwindow.h"
 #include "shared/util/timer.h"
 
+void Test() {
+  QMediaPlayer *player;
+  QVideoWidget *videoWidget;
+  QMediaPlaylist *playlist;
+
+  player = new QMediaPlayer;
+
+  playlist = new QMediaPlaylist(player);
+  playlist->addMedia(QUrl::fromLocalFile("/home/joydeepb/projects/rehab_robotics/media/4.mp4"));
+  playlist->addMedia(QUrl::fromLocalFile("/home/joydeepb/projects/rehab_robotics/media/5.mp4"));
+  playlist->addMedia(QUrl::fromLocalFile("/home/joydeepb/projects/rehab_robotics/media/6.mp4"));
+  playlist->setCurrentIndex(0);
+  player->setPlaylist(playlist);
+  videoWidget = new QVideoWidget;
+  player->setVideoOutput(videoWidget);
+
+  videoWidget->show();
+  player->play();
+}
+
 int main(int argc, char *argv[]) {
-  qRegisterMetaType<std::vector<std::string> >("std::vector<std::string>");
-
   QApplication app(argc, argv);
+  // Test();
   ut_automata_gui::MainWindow main_window;
+  // main_window.show();
   main_window.showFullScreen();
-
   return app.exec();
 }

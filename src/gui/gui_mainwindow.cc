@@ -39,6 +39,7 @@
 #include <QBoxLayout>
 #include <QLabel>
 #include <QMediaPlayer>
+#include <QMediaPlaylist>
 #include <QPainter>
 #include <QString>
 #include <QTime>
@@ -47,7 +48,10 @@
 #include <QGroupBox>
 #include <QTabWidget>
 #include <QVideoWidget>
+#include <QVBoxLayout>
 #include <QKeyEvent>
+#include <QDir>
+#include <QFileDialog>
 
 using std::string;
 using std::vector;
@@ -64,6 +68,19 @@ namespace ut_automata_gui {
 
 MainWindow::MainWindow(QWidget* parent) :
     main_layout_(nullptr) {
+  QString dir = QFileDialog::getExistingDirectory(
+      this, tr("Open Directory"),
+      QDir::currentPath(),
+      QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+  QDir directory(dir);
+  QStringList files = directory.entryList(QStringList() << "*.mp4" << "*.mov",QDir::Files);
+  if (files.length() < 3) {
+    fprintf(stderr, "ERROR: not enough videos found!\n");
+    exit(1);
+  }
+  videos_.push_back(dir + "/" + files[0]);
+  videos_.push_back(dir + "/" + files[1]);
+  videos_.push_back(dir + "/" + files[2]);
 
   player1 = new QMediaPlayer;
   player2 = new QMediaPlayer;
@@ -71,55 +88,85 @@ MainWindow::MainWindow(QWidget* parent) :
   videoWidget1 = new QVideoWidget;
   videoWidget2 = new QVideoWidget;
   videoWidget3 = new QVideoWidget;
-  // videoWidget3->setAutoOrientation(true);
   player1->setVideoOutput(videoWidget1);
   player2->setVideoOutput(videoWidget2);
   player3->setVideoOutput(videoWidget3);
-  player1->setMedia(QUrl::fromLocalFile("/home/joydeepb/projects/rehab_robotics/media/1.mp4"));
-  player2->setMedia(QUrl::fromLocalFile("/home/joydeepb/projects/rehab_robotics/media/2.mp4"));
-  player3->setMedia(QUrl::fromLocalFile("/home/joydeepb/projects/rehab_robotics/media/3.mp4"));
-  main_layout_ = new QHBoxLayout(this);
+
+  ReloadVideos();
+  main_layout_ = new QVBoxLayout(this);
   main_layout_->addWidget(videoWidget1);
   main_layout_->addWidget(videoWidget2);
   main_layout_->addWidget(videoWidget3);
   setLayout(main_layout_);
-  player1->setMuted(true);
-  player2->setMuted(true);
-  player3->setMuted(true);
-  player1->play();
-  player2->play();
-  player3->play();
-  player1->pause();
-  player2->pause();
-  player3->pause();
-  // main_layout_->addWidget(tab_widget_);
-  // connect(this, SIGNAL(keyPressEvent()), this, SLOT(toggle()));
+  
+  connect(player1, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
+  connect(player2, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
+  connect(player3, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
   /*
-  Three-button to four-button choices, triggered by one key per video.
-  Have a preview keyframe
-  After the video finishes, go back to preview keyframes
-  Check and rotate video orientation from metadata
+  When playing, play in full screen?
+  How to load new videos Using QDir - load the first three
+  
   Check compilation on Windows.
   */
+}
+
+void MainWindow::mediaStatusChanged(QMediaPlayer::MediaStatus status) {
+  printf("Status changed to %d num video: %d\n", 
+  status,
+  main_layout_->count());
+  if (status == QMediaPlayer::EndOfMedia) {
+    ReloadVideos();
+    playing_ = false;
+  }
 }
 
 void MainWindow::toggle() {
   player1->pause();
 }
 
+void MainWindow::ReloadVideos() {
+  const float h = this->height() / 3.1;
+  videoWidget1->setFixedHeight(h);
+  videoWidget2->setFixedHeight(h);
+  videoWidget3->setFixedHeight(h);
+  player1->setMedia(QUrl::fromLocalFile(videos_[0]));
+  player2->setMedia(QUrl::fromLocalFile(videos_[1]));
+  player3->setMedia(QUrl::fromLocalFile(videos_[2]));
+  player1->play();
+  player2->play();
+  player3->play();
+  player1->pause();
+  player2->pause();
+  player3->pause();
+}
+
 void MainWindow::keyPressEvent(QKeyEvent *event) {
   if (event->key() == Qt::Key_1) {
+    videoWidget1->setFixedHeight(this->height());
+    videoWidget2->setFixedHeight(0);
+    videoWidget3->setFixedHeight(0);
     player1->play();
     player2->pause();
     player3->pause();
+    playing_ = true;
   } else if (event->key() == Qt::Key_2) {
+    videoWidget2->setFixedHeight(this->height());
+    videoWidget1->setFixedHeight(0);
+    videoWidget3->setFixedHeight(0);
     player1->pause();
     player3->pause();
     player2->play();
+    playing_ = true;
   } else if (event->key() == Qt::Key_3) {
+    videoWidget3->setFixedHeight(this->height());
+    videoWidget2->setFixedHeight(0);
+    videoWidget1->setFixedHeight(0);
     player1->pause();
     player2->pause();
     player3->play();
+    playing_ = true;
+  } else if (event->key() == Qt::Key_Escape) {
+    this->close();
   } else {
     player1->pause();
     player2->pause();
@@ -131,6 +178,17 @@ void MainWindow::closeWindow() {
   close();
 }
 
-
+void MainWindow::resizeEvent(QResizeEvent * event) {
+  const auto w = this->width() / 1.05;
+  videoWidget1->setFixedWidth(w);
+  videoWidget2->setFixedWidth(w);
+  videoWidget3->setFixedWidth(w);
+  if (!playing_) {
+    const float h = this->height() / 3.1;
+    videoWidget1->setFixedHeight(h);
+    videoWidget2->setFixedHeight(h);
+    videoWidget3->setFixedHeight(h);
+  }
+}
 
 }  // namespace ut_automata_gui

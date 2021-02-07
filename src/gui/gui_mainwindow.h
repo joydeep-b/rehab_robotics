@@ -28,6 +28,9 @@
 #include <QFrame>
 #include <QPainter>
 #include <QWidget>
+#include <QMediaPlayer>
+#include <QVBoxLayout>
+#include <QString>
 
 class QLabel;
 class QHBoxLayout;
@@ -48,18 +51,21 @@ public:
 public slots:
   void closeWindow();
   void toggle();
+  void mediaStatusChanged(QMediaPlayer::MediaStatus status);
 
 signals:
 
 
 protected:
   void keyPressEvent(QKeyEvent *event);
+  void resizeEvent(QResizeEvent * event);
 
 private:
-
-  // Main layout of the window.
-  QHBoxLayout* main_layout_;
-
+  // QHBoxLayout* main_layout_;
+  QVBoxLayout* main_layout_;
+  std::vector<QString> videos_;
+  void ReloadVideos();
+  bool playing_ = false;
 };
 
 
