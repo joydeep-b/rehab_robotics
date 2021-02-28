@@ -1,6 +1,12 @@
 # rehab_robotics
 
-## Compiling under windows
+## Compiling under Linux
+
+```
+sudo apt install git cmake build-essential g++ vim qt5-default qtmultimedia5-dev
+```
+
+## Compiling under Windows
 
 ### Dependencies
 
