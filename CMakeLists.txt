@@ -43,7 +43,7 @@ ADD_SUBDIRECTORY(src/shared)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/shared)
 
 SET(libs glog gflags amrl_shared_lib
-    ${BUILD_SPECIFIC_LIBRARIES} X11 lua5.1 boost_system)
+    ${BUILD_SPECIFIC_LIBRARIES} X11)
 
 ADD_EXECUTABLE(gui
       src/gui/gui_main.cc

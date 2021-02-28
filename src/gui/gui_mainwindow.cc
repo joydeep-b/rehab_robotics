@@ -88,6 +88,7 @@ MainWindow::MainWindow(QWidget* parent) :
   videoWidget1 = new QVideoWidget;
   videoWidget2 = new QVideoWidget;
   videoWidget3 = new QVideoWidget;
+  
   player1->setVideoOutput(videoWidget1);
   player2->setVideoOutput(videoWidget2);
   player3->setVideoOutput(videoWidget3);
@@ -102,10 +103,8 @@ MainWindow::MainWindow(QWidget* parent) :
   connect(player1, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
   connect(player2, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
   connect(player3, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
-  /*
-  When playing, play in full screen?
-  How to load new videos Using QDir - load the first three
-  
+  /*  
+  Make all background black.
   Check compilation on Windows.
   */
 }
