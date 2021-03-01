@@ -3,7 +3,7 @@
 ## Compiling under Linux
 
 ```
-sudo apt install git cmake build-essential g++ vim qt5-default qtmultimedia5-dev
+sudo apt install git cmake build-essential g++ vim qt5-default qtmultimedia5-dev libgoogle-glog-dev libgflags-dev gstreamer1.0-libav gstreamer1.0-qt5
 ```
 
 ## Compiling under Windows
